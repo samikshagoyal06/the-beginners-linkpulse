@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="stats">
+  <div class="stat"><b>{{ total_links }}</b><span>Links created</span></div>
+  <div class="stat"><b>{{ total_clicks }}</b><span>Real clicks</span></div>
+  <div class="stat"><b>{{ bot_clicks }}</b><span>Bot clicks (not counted)</span></div>
+</div>
+
+<h2>Clicks in the last 7 days</h2>
+<div class="card">
+  {% for d in days %}
+  <div class="barrow">
+    <span class="barlabel">{{ d.day }}</span>
+    <span class="bar" style="width: {{ d.percent }}%"></span>
+    <span class="barcount">{{ d.count }}</span>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="row">
+  <div>
+    <h2>Browsers</h2>
+    <table>
+      <tr><th>Browser</th><th>Clicks</th></tr>
+      {% for b in browsers %}<tr><td>{{ b.browser }}</td><td>{{ b.n }}</td></tr>
+      {% else %}<tr><td colspan="2">No clicks yet</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div>
+    <h2>Devices</h2>
+    <table>
+      <tr><th>Device</th><th>Clicks</th></tr>
+      {% for d in devices %}<tr><td>{{ d.device }}</td><td>{{ d.n }}</td></tr>
+      {% else %}<tr><td colspan="2">No clicks yet</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+
+<h2>All links (top links first)</h2>
+<table>
+  <tr><th>Short link</th><th>Destination</th><th>Clicks</th><th>Limit</th><th>Expires</th><th>Status</th><th>Action</th></tr>
+  {% for r in rows %}
+  <tr>
+    <td><a href="/{{ r.link.code }}" target="_blank">{{ base }}{{ r.link.code }}</a></td>
+    <td class="dest">{{ r.link.destination_url }}</td>
+    <td>{{ r.link.click_count }}</td>
+    <td>{{ r.link.click_limit or "-" }}</td>
+    <td>{{ r.link.expires_on or "-" }}</td>
+    <td><span class="tag {{ 'ok' if r.status == 'active' else 'bad' }}">{{ r.status }}</span></td>
+    <td>
+      {% if r.link.is_active %}
+      <form method="post" action="/disable/{{ r.link.code }}"><button class="small">Disable</button></form>
+      {% else %}
+      <form method="post" action="/enable/{{ r.link.code }}"><button class="small">Enable</button></form>
+      {% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="7">No links yet. <a href="/">Create one</a>.</td></tr>
+  {% endfor %}
+</table>
+<p class="muted">Expired, limit-reached and disabled links keep their click history.</p>
+{% endblock %}

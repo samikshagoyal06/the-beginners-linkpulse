@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Shorten a link</h1>
+<p class="muted">Paste a long URL, get a short link you can track.</p>
+
+{% for e in errors %}<div class="box error">{{ e }}</div>{% endfor %}
+{% for w in warnings %}<div class="box warn">Warning: {{ w }}</div>{% endfor %}
+
+<form method="post" class="card">
+  <label>Destination URL *</label>
+  <input type="text" name="url" placeholder="https://example.com/very/long/page" value="{{ form.get('url', '') }}">
+
+  <label>Custom alias (optional)</label>
+  <input type="text" name="alias" placeholder="my-event" value="{{ form.get('alias', '') }}">
+
+  <div class="row">
+    <div>
+      <label>Expiry date (optional)</label>
+      <input type="date" name="expires_on" value="{{ form.get('expires_on', '') }}">
+    </div>
+    <div>
+      <label>Click limit (optional)</label>
+      <input type="number" name="click_limit" min="1" placeholder="e.g. 100" value="{{ form.get('click_limit', '') }}">
+    </div>
+  </div>
+  <button type="submit">Create short link</button>
+</form>
+
+{% if short_url %}
+<div class="card success">
+  <h2>Your short link is ready</h2>
+  <p class="shortlink"><a href="{{ short_url }}" target="_blank">{{ short_url }}</a></p>
+  <img src="/qr/{{ code }}.png" alt="QR code" width="180">
+  <p class="muted">Right-click the QR code to save it.</p>
+</div>
+{% endif %}
+{% endblock %}
